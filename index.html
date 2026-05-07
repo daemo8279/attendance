@@ -9,16 +9,28 @@
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:13px;background:#F0F4FF;color:#212121;}
 button,input,select{font-family:inherit;cursor:pointer;}
 .app{display:flex;min-height:100vh;}
-.sidebar{width:190px;min-height:100vh;background:#fff;border-right:1px solid #eee;display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100;}
-.logo{padding:16px 18px 12px;font-size:17px;font-weight:800;border-bottom:1px solid #f0f0f0;color:#212121;}
+.sidebar{width:190px;min-height:100vh;background:#fff;border-right:1px solid #eee;display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:width .2s ease;overflow:hidden;}
+.sidebar.collapsed{width:56px;}
+.logo{padding:16px 18px 12px;font-size:17px;font-weight:800;border-bottom:1px solid #f0f0f0;color:#212121;display:flex;align-items:center;justify-content:space-between;white-space:nowrap;}
 .logo span{color:#1677FF;}
-.nav{padding:10px 8px;flex:1;}
-.nb{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;font-size:13px;font-weight:600;border:none;width:100%;text-align:left;margin-bottom:2px;background:transparent;color:#555;cursor:pointer;transition:all .15s;}
+.logo-txt{transition:opacity .15s;}
+.sidebar.collapsed .logo-txt{opacity:0;pointer-events:none;}
+.sb-toggle{width:24px;height:24px;border-radius:6px;border:1.5px solid #eee;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:transform .2s;}
+.sidebar.collapsed .sb-toggle{transform:rotate(180deg);}
+.nav{padding:10px 8px;flex:1;overflow:hidden;}
+.nb{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;font-size:13px;font-weight:600;border:none;width:100%;text-align:left;margin-bottom:2px;background:transparent;color:#555;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .nb:hover{background:#F7F8F9;color:#212121;}
 .nb.on{background:#E5F2FD;color:#1677FF;font-weight:700;}
-.sb-bot{padding:12px 16px;border-top:1px solid #f0f0f0;}
+.nb-lbl{transition:opacity .15s;}
+.sidebar.collapsed .nb-lbl{opacity:0;pointer-events:none;}
+.sidebar.collapsed .nb{padding:9px;justify-content:center;}
+.sb-bot{padding:12px 16px;border-top:1px solid #f0f0f0;white-space:nowrap;overflow:hidden;}
+.sb-bot-txt{transition:opacity .15s;}
+.sidebar.collapsed .sb-bot-txt{opacity:0;pointer-events:none;}
+.sidebar.collapsed .sb-bot{padding:12px 8px;display:flex;justify-content:center;}
 .av{width:30px;height:30px;border-radius:50%;background:#1677FF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
-.main{margin-left:190px;flex:1;}
+.main{margin-left:190px;flex:1;transition:margin-left .2s ease;}
+.main.collapsed{margin-left:56px;}
 .page{padding:22px 26px;animation:fi .18s ease;}
 @keyframes fi{from{opacity:0;transform:translateY(4px);}to{opacity:1;}}
 .card{background:#fff;border-radius:12px;border:1px solid #eee;}
@@ -50,17 +62,22 @@ button,input,select{font-family:inherit;cursor:pointer;}
 </head>
 <body>
 <div class="app">
-  <div class="sidebar">
-    <div class="logo">MATH<span>OLIC</span></div>
+  <div class="sidebar" id="sidebar">
+    <div class="logo">
+      <span class="logo-txt">MATH<span>OLIC</span></span>
+      <button class="sb-toggle" id="sb-toggle" title="메뉴 접기">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
     <div class="nav" id="nav"></div>
     <div class="sb-bot">
       <div style="display:flex;align-items:center;gap:8px">
         <div class="av">김</div>
-        <div><div style="font-size:12px;font-weight:700;color:#212121">김선생님</div><div style="font-size:10px;color:#aaa">관리자</div></div>
+        <div class="sb-bot-txt"><div style="font-size:12px;font-weight:700;color:#212121">김선생님</div><div style="font-size:10px;color:#aaa">관리자</div></div>
       </div>
     </div>
   </div>
-  <div class="main" id="main"></div>
+  <div class="main" id="main-wrap2" style="margin-left:190px;flex:1;transition:margin-left .2s ease"><div id="main"></div></div>
 </div>
 
 <!-- 캘린더 팝업 -->
@@ -202,7 +219,7 @@ function renderNav() {
   var nav = document.getElementById('nav');
   nav.innerHTML = NAV_ITEMS.map(function(it,i){
     var on = PG===i;
-    return '<button class="nb'+(on?' on':'')+'" data-pg="'+i+'"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="color:inherit;flex-shrink:0">'+it.svg+'</svg>'+it.lbl+'</button>';
+    return '<button class="nb'+(on?' on':'')+'" data-pg="'+i+'"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="color:inherit;flex-shrink:0">'+it.svg+'</svg><span class="nb-lbl">'+it.lbl+'</span></button>';
   }).join('');
   nav.querySelectorAll('[data-pg]').forEach(function(btn){
     btn.addEventListener('click', function(){
@@ -477,8 +494,10 @@ function buildMo(list) {
 // ══════════════════════════════════════════
 // 학생 상세
 // ══════════════════════════════════════════
+// 학생 상세 캘린더 월 이동용 상태
+var SDS_CAL = {m: TODAY.m, y: TODAY.y};
+
 function sdHTML() {
-  if (SDS.dsi >= 0) return sdDetailHTML(SDS.dsi);
   var td=SDS.day, tm=TODAY.m, ty=TODAY.y, tdw=DW[gdow(td)];
   var list = SD.filter(function(s){
     if(SDS.sq&&s.nm.indexOf(SDS.sq)<0) return false;
@@ -491,14 +510,15 @@ function sdHTML() {
     return true;
   });
   function fb(k,lbl,bdr,bg,col){
-    return '<button data-sdf="'+k+'" style="padding:5px 13px;border-radius:20px;border:1.5px solid '+(SDS.filt===k?bdr:'#ddd')+';background:'+(SDS.filt===k?bg:'#fff')+';color:'+(SDS.filt===k?col:'#999')+';font-size:11px;font-weight:700;cursor:pointer">'+lbl+'</button>';
+    return '<button data-sdf="'+k+'" style="padding:4px 11px;border-radius:20px;border:1.5px solid '+(SDS.filt===k?bdr:'#ddd')+';background:'+(SDS.filt===k?bg:'#fff')+';color:'+(SDS.filt===k?col:'#999')+';font-size:11px;font-weight:700;cursor:pointer">'+lbl+'</button>';
   }
   var rows = list.map(function(s){
     var ri=SD.indexOf(s); var e=s.data[td]; var ss=e?e.s:[]; var hm=ss.length>1;
-    return '<tr onmouseenter="this.style.background=\'#f5f8ff\'" onmouseleave="this.style.background=\'\'">'
+    var isActive = SDS.dsi===ri;
+    return '<tr id="sdrow'+ri+'" style="cursor:pointer;background:'+(isActive?'#E5F2FD':'')+';border-left:3px solid '+(isActive?'#1677FF':'transparent')+'" onmouseenter="if('+(!isActive)+')this.style.background=\'#f5f8ff\'" onmouseleave="if('+(!isActive)+')this.style.background=\'\'">'
       +'<td><div style="display:flex;align-items:center;gap:9px">'
       +'<div style="width:34px;height:34px;border-radius:50%;background:'+(hm?'#FFF3E0':'#E5F2FD')+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:'+(hm?'#e67e22':'#1677FF')+';flex-shrink:0">'+s.av+'</div>'
-      +'<div><div style="display:flex;align-items:center;gap:4px"><span data-dtl="'+ri+'" style="font-size:14px;font-weight:800;color:#1677FF;cursor:pointer;text-decoration:underline">'+s.nm+'</span>'+(hm?bdg(ss.length+'회','#FFF3E0','#e67e22'):'')+'</div><div style="font-size:10px;color:#ccc">0123456</div></div></div></td>'
+      +'<div><div style="display:flex;align-items:center;gap:4px"><span data-dtl="'+ri+'" style="font-size:14px;font-weight:800;color:#1677FF;cursor:pointer">'+s.nm+'</span>'+(hm?bdg(ss.length+'회','#FFF3E0','#e67e22'):'')+'</div><div style="font-size:10px;color:#ccc">0123456</div></div></div></td>'
       +'<td style="color:#555;font-size:12px">'+s.cl+'</td>'
       +'<td><div style="display:flex;flex-direction:column;gap:3px">'
       +(ss.length?ss.map(function(sess,idx){
@@ -510,10 +530,22 @@ function sdHTML() {
           +'</div>';
       }).join(''):'<span style="font-size:12px;color:#ccc">미등원</span>')
       +'</div></td>'
-      +'<td style="color:#aaa;font-size:11px">'+(e&&e.n?e.n:'—')+'</td></tr>';
+      +'<td style="color:#aaa;font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(e&&e.n?e.n:'—')+'</td></tr>';
   }).join('');
-  return '<div class="page">'
-    +'<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">'
+
+  // 우측 패널: 캘린더
+  var rightPanel = '';
+  if (SDS.dsi >= 0) {
+    rightPanel = sdCalPanel(SDS.dsi);
+  } else {
+    rightPanel = '<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#ccc;min-height:400px">'
+      +'<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="4" y="8" width="40" height="36" rx="4" stroke="#ddd" stroke-width="2.5"/><path d="M16 4v8M32 4v8M4 20h40" stroke="#ddd" stroke-width="2.5" stroke-linecap="round"/></svg>'
+      +'<div style="font-size:13px;font-weight:600">학생 이름을 클릭하면<br>월간 출결 이력이 표시됩니다</div></div>';
+  }
+
+  return '<div class="page" style="padding-bottom:0">'
+    // 헤더
+    +'<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px">'
     +'<div><div style="font-size:19px;font-weight:800;color:#212121">학생별 상세</div><div style="font-size:12px;color:#999;margin-top:2px">이름을 클릭하면 월간 출결 이력을 확인합니다</div></div>'
     +'<div style="display:flex;gap:8px;align-items:center">'
     +'<div style="display:flex;align-items:center;gap:5px;border:2px solid #ddd;border-radius:8px;padding:4px 10px;background:#fff">'
@@ -521,55 +553,100 @@ function sdHTML() {
     +'<input id="sd-sq" type="text" placeholder="학생명 검색" value="'+SDS.sq+'" style="border:none;outline:none;font-size:12px;color:#212121;width:120px;background:transparent"></div>'
     +'<select id="sd-clf" class="sel"><option value="">전체 반</option><option'+(SDS.clf==='글쟁반'?' selected':'')+'>글쟁반</option><option'+(SDS.clf==='고등 심화반'?' selected':'')+'>고등 심화반</option><option'+(SDS.clf==='여름 주말 특강반'?' selected':'')+'>여름 주말 특강반</option></select>'
     +'</div></div>'
-    +'<div class="card" style="padding:13px 18px;margin-bottom:13px;border-color:#1677FF;border-width:1.5px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px">'
-    +'<div style="display:flex;align-items:center;gap:11px">'
-    +'<button id="cal-btn" style="width:38px;height:38px;border-radius:9px;background:#1677FF;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
-    +'<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="13" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M6 1v3M12 1v3M2 8h14" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></button>'
+    // 날짜 배너 + 필터
+    +'<div class="card" style="padding:11px 16px;margin-bottom:12px;border-color:#1677FF;border-width:1.5px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'
+    +'<div style="display:flex;align-items:center;gap:10px">'
+    +'<button id="cal-btn" style="width:36px;height:36px;border-radius:8px;background:#1677FF;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
+    +'<svg width="17" height="17" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="13" rx="2" stroke="#fff" stroke-width="1.5"/><path d="M6 1v3M12 1v3M2 8h14" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></button>'
     +'<div><div style="font-size:10px;color:#999;font-weight:600">조회 날짜 <span style="color:#1677FF;cursor:pointer">클릭하여 변경</span></div>'
-    +'<div style="font-size:16px;font-weight:800;color:#212121">'+ty+'년 '+tm+'월 '+td+'일 <span style="color:#1677FF">('+tdw+')</span></div></div>'
+    +'<div style="font-size:15px;font-weight:800;color:#212121">'+ty+'년 '+tm+'월 '+td+'일 <span style="color:#1677FF">('+tdw+')</span></div></div>'
     +'</div>'
-    +'<div style="display:flex;gap:5px;flex-wrap:wrap">'
+    +'<div style="display:flex;gap:4px;flex-wrap:wrap">'
     +fb('all','전체','#1677FF','#E5F2FD','#1677FF')
     +fb('in','등원','#1677FF','#E5F2FD','#1677FF')
     +fb('out','하원','#FB1A18','#FFF0F0','#FB1A18')
     +fb('none','미등원','#888','#F7F8F9','#555')
     +fb('multi','다회 방문','#e67e22','#FFF3E0','#e67e22')
     +'</div></div>'
-    +'<div class="card" style="overflow:hidden"><table class="tbl"><thead><tr>'
-    +'<th style="width:200px">학생</th><th>반</th>'
-    +'<th><div style="display:flex;align-items:center;gap:6px">오늘 등하원'+pill(tm+'/'+td+' ('+tdw+')','#E5F2FD','#1677FF')+'</div></th>'
-    +'<th>메모</th></tr></thead><tbody>'
-    +(rows||'<tr><td colspan="4" style="text-align:center;padding:30px;color:#bbb">조건에 맞는 학생이 없습니다</td></tr>')
-    +'</tbody></table></div></div>';
+    // 좌우 분할
+    +'<div style="display:flex;gap:14px;align-items:flex-start;min-height:500px">'
+    // 좌: 학생 리스트 (이름만)
+    +'<div class="card" style="width:200px;flex-shrink:0;overflow:hidden">'
+    +'<div style="padding:10px 12px;background:#F7F8F9;border-bottom:2px solid #eee;font-size:11px;font-weight:800;color:#555">학생</div>'
+    +'<div>'
+    +( list.length ? list.map(function(s){
+        var ri=SD.indexOf(s); var isActive=SDS.dsi===ri;
+        return '<div id="sdrow'+ri+'" data-dtl="'+ri+'" style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-bottom:1px solid #F7F8F9;cursor:pointer;border-left:3px solid '+(isActive?'#1677FF':'transparent')+';background:'+(isActive?'#E5F2FD':'')+'" onmouseenter="if(!'+isActive+')this.style.background=\'#f5f8ff\'" onmouseleave="if(!'+isActive+')this.style.background=\'\'">'
+          +'<div style="width:32px;height:32px;border-radius:50%;background:'+(isActive?'#1677FF':'#E5F2FD')+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:'+(isActive?'#fff':'#1677FF')+';flex-shrink:0">'+s.av+'</div>'
+          +'<div><div style="font-size:13px;font-weight:700;color:#212121">'+s.nm+'</div><div style="font-size:10px;color:#bbb">'+s.cl+'</div></div>'
+          +'</div>';
+      }).join('') : '<div style="padding:24px;text-align:center;color:#bbb;font-size:12px">조건에 맞는 학생이 없습니다</div>' )
+    +'</div></div>'
+    // 우: 캘린더 패널
+    +'<div style="flex:1;min-width:0" id="sd-right">'+rightPanel+'</div>'
+    +'</div></div>';
 }
-function sdDetailHTML(si) {
-  var s=SD[si]; var cells='';
-  for(var i=0;i<1;i++) cells+='<div style="border-radius:7px;min-height:78px;background:#F7F8F9;opacity:0.3;border:1px solid #eee"></div>';
-  for(var d=1;d<=30;d++){
-    var e=s.data[d]; var ss=e?e.s:[]; var hm=ss.length>1; var isT=(d===TODAY.d);
+
+function sdCalPanel(si) {
+  var s = SD[si];
+  var cm2 = SDS_CAL.m; var cy2 = SDS_CAL.y;
+  // 해당 월 1일 요일 (fMap: 월=0 기준)
+  var fMap = {1:3,2:0,3:0,4:1,5:4,6:6,7:2,8:5,9:1,10:3,11:6,12:2};
+  var fi = (fMap[cm2]||0);
+  var dMax = [31,28,31,30,31,30,31,31,30,31,30,31][cm2-1];
+  // 셀 생성
+  var cells = '';
+  for(var i=0;i<fi;i++) cells+='<div style="min-height:68px;border-radius:7px;background:#F7F8F9;opacity:0.25;border:1px solid #eee"></div>';
+  for(var d=1;d<=dMax;d++){
+    var e=s.data[d]&&cm2===TODAY.m?s.data[d]:null;
+    // 월이 TODAY.m인 경우에만 데이터 표시 (프로토타입 데이터가 4월 기준)
+    if(cm2===TODAY.m) e=s.data[d]||null;
+    var ss=e?e.s:[]; var hm=ss.length>1; var isT=(d===TODAY.d&&cm2===TODAY.m&&cy2===TODAY.y);
     var inner='';
     ss.forEach(function(sess,idx){
       if(hm) inner+='<div style="font-size:8px;font-weight:800;color:'+(SC[idx]||'#555')+';margin-top:'+(idx?2:0)+'px">'+(idx+1)+'회차</div>';
-      if(sess.i) inner+='<div style="font-size:9px;padding:1px 2px;border-radius:2px;background:#E5F2FD;color:#0C447C;text-align:center">'+sess.i+'</div>';
-      if(sess.o) inner+='<div style="font-size:9px;padding:1px 2px;border-radius:2px;background:#FFF0F0;color:#A32D2D;text-align:center;margin-top:1px">'+sess.o+'</div>';
+      if(sess.i) inner+='<div style="font-size:10px;padding:1px 3px;border-radius:3px;background:#E5F2FD;color:#0C447C;text-align:center;font-weight:700">'+sess.i+'</div>';
+      if(sess.o) inner+='<div style="font-size:10px;padding:1px 3px;border-radius:3px;background:#FFF0F0;color:#A32D2D;text-align:center;margin-top:1px;font-weight:700">'+sess.o+'</div>';
     });
     if(e&&e.n&&!hm) inner+='<div style="width:5px;height:5px;border-radius:50%;background:#e67e22;margin:2px auto 0"></div>';
-    cells+='<div style="background:'+(isT?'#f0f6ff':hm?'#FFF8F0':'#fff')+';border:'+(isT?'2px solid #1677FF':'1px solid #eee')+';border-radius:7px;min-height:78px;padding:5px;cursor:'+(e?'pointer':'default')+';position:relative"'+(e?' data-edit="'+si+','+d+'"':'')+'>  <div style="font-size:10px;font-weight:'+(isT?800:600)+';color:'+(isT?'#1677FF':'#555')+';margin-bottom:2px">'+d+(isT?'<span style="font-size:8px;margin-left:2px;color:#1677FF">오늘</span>':'')+'</div>'+(hm?'<div style="position:absolute;top:2px;right:2px;padding:1px 3px;border-radius:3px;background:#e67e22;color:#fff;font-size:7px;font-weight:800">'+ss.length+'회</div>':'')+inner+'</div>';
+    cells+='<div style="background:'+(isT?'#E5F2FD':hm?'#FFF8F0':'#fff')+';border:'+(isT?'2px solid #1677FF':'1px solid #eee')+';border-radius:7px;min-height:68px;padding:5px;cursor:'+(e?'pointer':'default')+';position:relative;transition:border-color .15s" onmouseenter="if(!'+isT+')this.style.borderColor=\'#1677FF\'" onmouseleave="if(!'+isT+')this.style.borderColor=\''+(isT?'#1677FF':'#eee')+'\'"'+(e?' data-edit="'+si+','+d+'"':'')+'>  <div style="font-size:10px;font-weight:'+(isT?800:600)+';color:'+(isT?'#1677FF':'#777')+';margin-bottom:2px">'+d+(isT?'<span style="font-size:8px;margin-left:2px;color:#1677FF">오늘</span>':'')+'</div>'+(hm?'<div style="position:absolute;top:2px;right:2px;padding:1px 3px;border-radius:3px;background:#e67e22;color:#fff;font-size:7px;font-weight:800">'+ss.length+'회</div>':'')+inner+'</div>';
   }
-  return '<div class="page">'
-    +'<div style="display:flex;align-items:center;gap:11px;margin-bottom:18px">'
-    +'<button id="sd-back" class="btn btn-ghost" style="display:flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="#212121" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>목록으로</button>'
-    +'<div style="font-size:19px;font-weight:800;color:#212121">'+s.nm+' 학생</div>'
-    +'<span style="font-size:12px;color:#555;background:#F7F8F9;padding:4px 11px;border-radius:8px;font-weight:600">'+s.cl+'</span></div>'
-    +'<div class="card" style="padding:18px 20px">'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;flex-wrap:wrap;gap:8px">'
+  // 수정 이력 (메모가 있는 날 수집)
+  var logs = [];
+  for(var d2=1;d2<=dMax;d2++){
+    if(cm2===TODAY.m){var ev=s.data[d2];if(ev&&ev.n) logs.push({d:d2,n:ev.n});}
+  }
+  var logHTML = logs.length
+    ? logs.map(function(l){
+        return '<div style="display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-bottom:1px solid #F7F8F9">'
+          +'<div style="width:28px;height:28px;border-radius:50%;background:#F7F8F9;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#bbb" stroke-width="1.3"/><path d="M6.5 4v3l2 1" stroke="#bbb" stroke-width="1.3" stroke-linecap="round"/></svg></div>'
+          +'<div><div style="font-size:11px;color:#888;margin-bottom:2px">'+TODAY.y+'.'+pd(cm2)+'.'+pd(l.d)+' · 특이사항</div>'
+          +'<div style="font-size:13px;color:#212121;font-weight:600">'+l.n+'</div></div></div>';
+      }).join('')
+    : '<div style="padding:18px 14px;color:#bbb;font-size:12px;text-align:center">이 달의 특이사항 메모가 없습니다</div>';
+
+  return '<div class="card" style="overflow:hidden">'
+    // 패널 헤더
+    +'<div style="padding:14px 18px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between">'
+    +'<div style="display:flex;align-items:center;gap:10px">'
+    +'<div style="width:36px;height:36px;border-radius:50%;background:#E5F2FD;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#1677FF;flex-shrink:0">'+s.av+'</div>'
+    +'<div><div style="font-size:15px;font-weight:800;color:#212121">'+s.nm+' 학생</div><div style="font-size:11px;color:#aaa">'+s.cl+'</div></div></div>'
     +'<div style="display:flex;align-items:center;gap:8px">'
-    +'<button class="btn btn-ghost" style="width:26px;height:26px;padding:0;border-radius:50%;font-size:14px;font-weight:800">‹</button>'
-    +'<span style="font-size:14px;font-weight:800;color:#212121">'+TODAY.y+'년 '+TODAY.m+'월</span>'
-    +'<button class="btn btn-ghost" style="width:26px;height:26px;padding:0;border-radius:50%;font-size:14px;font-weight:800">›</button></div>'
-    +'<div style="display:flex;align-items:center;gap:9px;font-size:11px;font-weight:600;color:#555">'+dot('#1677FF')+' 등원 &nbsp; '+dot('#FB1A18')+' 하원</div></div>'
+    +'<button id="sdc-prev" style="width:26px;height:26px;border-radius:50%;border:1.5px solid #ddd;background:#fff;color:#212121;cursor:pointer;font-size:14px;font-weight:800">‹</button>'
+    +'<span id="sdc-lbl" style="font-size:13px;font-weight:800;color:#212121;min-width:80px;text-align:center">'+cy2+'년 '+cm2+'월</span>'
+    +'<button id="sdc-next" style="width:26px;height:26px;border-radius:50%;border:1.5px solid #ddd;background:#fff;color:#212121;cursor:pointer;font-size:14px;font-weight:800">›</button>'
+    +'<div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#555">'+dot('#1677FF')+' 등원 '+dot('#FB1A18')+' 하원</div>'
+    +'</div></div>'
+    // 달력
+    +'<div style="padding:14px 16px">'
     +'<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px">'+DW.slice(1).map(function(d){ return '<div style="font-size:11px;font-weight:700;color:#999;text-align:center;padding:3px 0">'+d+'</div>'; }).join('')+'</div>'
-    +'<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">'+cells+'</div></div></div>';
+    +'<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">'+cells+'</div>'
+    +'</div>'
+    // 메모 이력
+    +'<div style="border-top:2px solid #eee">'
+    +'<div style="padding:12px 16px 8px;font-size:13px;font-weight:800;color:#212121">등·하원 수정 이력</div>'
+    +logHTML
+    +'</div></div>';
 }
 
 // ══════════════════════════════════════════
@@ -718,6 +795,31 @@ document.getElementById('conf-ok').addEventListener('click', function(){
   if (confCb) { confCb(); confCb = null; }
 });
 
+function bindSdcPanel() {
+  var prev = document.getElementById('sdc-prev');
+  var next = document.getElementById('sdc-next');
+  if (prev) prev.onclick = function(){
+    SDS_CAL.m--; if(SDS_CAL.m<1){SDS_CAL.m=12;SDS_CAL.y--;}
+    var right=document.getElementById('sd-right');
+    if(right&&SDS.dsi>=0) right.innerHTML=sdCalPanel(SDS.dsi);
+    bindSdcPanel();
+  };
+  if (next) next.onclick = function(){
+    SDS_CAL.m++; if(SDS_CAL.m>12){SDS_CAL.m=1;SDS_CAL.y++;}
+    var right=document.getElementById('sd-right');
+    if(right&&SDS.dsi>=0) right.innerHTML=sdCalPanel(SDS.dsi);
+    bindSdcPanel();
+  };
+  // 캘린더 셀 수정 클릭
+  var right2=document.getElementById('sd-right');
+  if(right2) right2.querySelectorAll('[data-edit]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var p=btn.getAttribute('data-edit').split(',');
+      openEdit(parseInt(p[0]),parseInt(p[1]));
+    });
+  });
+}
+
 // ══════════════════════════════════════════
 // bindMain : 매 렌더 후 이벤트 연결
 // ══════════════════════════════════════════
@@ -821,11 +923,25 @@ function bindMain() {
   });
 
   m.querySelectorAll('[data-dtl]').forEach(function(el){
-    el.addEventListener('click', function(){ SDS.dsi=parseInt(el.getAttribute('data-dtl')); renderMain(); });
+    el.addEventListener('click', function(){
+      SDS.dsi = parseInt(el.getAttribute('data-dtl'));
+      SDS_CAL.m = TODAY.m; SDS_CAL.y = TODAY.y;
+      // 우측 패널만 교체 (전체 재렌더 없이)
+      var right = document.getElementById('sd-right');
+      if (right) {
+        right.innerHTML = sdCalPanel(SDS.dsi);
+        // 활성 행 하이라이트 갱신
+        m.querySelectorAll('[id^="sdrow"]').forEach(function(tr){
+          var rid = parseInt(tr.id.replace('sdrow',''));
+          tr.style.background = rid===SDS.dsi ? '#E5F2FD' : '';
+          tr.style.borderLeft = rid===SDS.dsi ? '3px solid #1677FF' : '3px solid transparent';
+        });
+        bindSdcPanel();
+      }
+    });
   });
 
-  var sdBack = document.getElementById('sd-back');
-  if (sdBack) sdBack.addEventListener('click', function(){ SDS.dsi=-1; renderMain(); });
+  bindSdcPanel();
 
   var calBtn = document.getElementById('cal-btn');
   if (calBtn) calBtn.addEventListener('click', function(e){ e.stopPropagation(); if(CAL.open) closeCal(); else openCal(calBtn); });
@@ -852,6 +968,14 @@ function bindMain() {
 // ── 시작 ──────────────────────────────────
 renderNav();
 renderMain();
+
+// 사이드바 접기 토글
+document.getElementById('sb-toggle').addEventListener('click', function(){
+  var sb = document.getElementById('sidebar');
+  var mw = document.getElementById('main-wrap2');
+  var collapsed = sb.classList.toggle('collapsed');
+  mw.style.marginLeft = collapsed ? '56px' : '190px';
+});
 </script>
 </body>
 </html>
