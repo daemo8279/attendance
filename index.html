@@ -323,18 +323,21 @@ function blkSelectHTML() {
       var si=SD.indexOf(s); var isSel=b.sel.indexOf(si)>=0;
       var e=s.data[b.d]; var ss=(e&&e.s)?e.s.filter(function(x){return x.i;}):[];
       var sessPills='';
-      if(ss.length) sessPills='<div style="margin-top:3px;display:flex;flex-wrap:wrap;gap:3px">'+ss.map(function(sess,idx){
+      if(ss.length) sessPills='<div style="margin-top:3px;display:flex;flex-wrap:wrap;gap:3px;align-items:center">'+ss.map(function(sess,idx){
         var multi=ss.length>1; var rc=multi?(SC[idx]||'#555'):'#1677FF'; var rb=multi?(SB[idx]||'#E5F2FD'):'#E5F2FD';
         return (multi?'<span style="padding:0 4px;border-radius:2px;background:'+rb+';color:'+rc+';font-size:8px;font-weight:700">'+(idx+1)+'회</span>':'')+
-          '<span style="padding:1px 6px;border-radius:4px;background:#E5F2FD;color:#0C447C;font-size:10px;font-weight:700">'+sess.i+'</span>'+
-          '<span style="color:#ddd;font-size:9px;margin:0 1px">→</span>'+
-          (sess.o?'<span style="padding:1px 6px;border-radius:4px;background:#FFF0F0;color:#A32D2D;font-size:10px;font-weight:700">'+sess.o+'</span>':'<span style="font-size:9px;color:#bbb;font-style:italic">진행중</span>');
-      }).join(' ')+'</div>';
-      return '<div style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid #F7F8F9;background:'+(isSel?'#EEF6FF':'#fff')+'">'
-        +'<div style="width:28px;height:28px;border-radius:50%;background:'+(isSel?'#E5F2FD':'#F5F5F5')+';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:'+(isSel?'#1677FF':'#888')+';flex-shrink:0">'+s.av+'</div>'
-        +'<div style="flex:1;min-width:0"><span style="font-size:12px;font-weight:700;color:'+(isSel?'#1677FF':'#212121')+'">'+s.nm+'</span><span style="font-size:10px;color:#bbb;margin-left:5px">'+s.cl+'</span>'+sessPills+'</div>'
-        +'<button class="blk-sel-btn" data-bsi="'+si+'" style="width:22px;height:22px;border-radius:6px;border:1.5px solid '+(isSel?'#1677FF':'#ddd')+';background:'+(isSel?'#1677FF':'#fff')+';cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
-        +(isSel?'<svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>':'<svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 2v6M2 5h6" stroke="#aaa" stroke-width="1.5" stroke-linecap="round"/></svg>')
+          '<span style="padding:2px 8px;border-radius:5px;background:#E5F2FD;color:#0C447C;font-size:11px;font-weight:700">'+sess.i+'</span>'+
+          '<span style="color:#ddd;font-size:11px;margin:0 2px">→</span>'+
+          (sess.o?'<span style="padding:2px 8px;border-radius:5px;background:#FFF0F0;color:#A32D2D;font-size:11px;font-weight:700">'+sess.o+'</span>':'<span style="font-size:10px;color:#bbb;font-style:italic">진행중</span>');
+      }).join('  ')+'</div>';
+      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid #F5F5F5;background:'+(isSel?'#EEF6FF':'#fff')+'">'
+        +'<div style="width:32px;height:32px;border-radius:50%;background:'+(isSel?'#E5F2FD':'#F0F0F0')+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:'+(isSel?'#1677FF':'#888')+';flex-shrink:0">'+s.av+'</div>'
+        +'<div style="flex:1;min-width:0">'
+        +'<span style="font-size:13px;font-weight:700;color:'+(isSel?'#1677FF':'#212121')+'">'+s.nm+'</span>'
+        +' <span style="font-size:11px;color:#bbb">'+s.cl+'</span>'
+        +sessPills+'</div>'
+        +'<button class="blk-sel-btn" data-bsi="'+si+'" style="width:26px;height:26px;border-radius:8px;border:1.5px solid '+(isSel?'#1677FF':'#ddd')+';background:'+(isSel?'#1677FF':'#fff')+';cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
+        +(isSel?'<svg width="12" height="12" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':'<svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2v8M2 6h8" stroke="#aaa" stroke-width="1.6" stroke-linecap="round"/></svg>')
         +'</button></div>';
     }).join('');
   } else {
@@ -345,49 +348,79 @@ function blkSelectHTML() {
     gKeys.forEach(function(cl){
       var gSI=groups[cl].map(function(s){return SD.indexOf(s);});
       var allSel=gSI.length>0&&gSI.every(function(si){return b.sel.indexOf(si)>=0;});
-      rows+='<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:#F7F8F9;border-bottom:1px solid #eee">'
+      rows+='<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 18px;background:#F7F8F9;border-bottom:1px solid #eee">'
         +'<span style="font-size:11px;font-weight:800;color:#555">'+cl+'</span>'
-        +'<button class="blk-grp-sel" data-gcl="'+cl+'" style="font-size:10px;font-weight:700;color:#1677FF;border:none;background:transparent;cursor:pointer">'+(allSel?'전체 취소':'전체선택')+'</button></div>';
+        +'<button class="blk-grp-sel" data-gcl="'+cl+'" style="font-size:11px;font-weight:700;color:#1677FF;border:none;background:transparent;cursor:pointer">'+(allSel?'전체 취소':'전체선택')+'</button></div>';
       groups[cl].forEach(function(s){
         var si=SD.indexOf(s); var isSel=b.sel.indexOf(si)>=0;
-        rows+='<div style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid #F7F8F9;background:'+(isSel?'#EEF6FF':'#fff')+'">'
-          +'<div style="width:28px;height:28px;border-radius:50%;background:'+(isSel?'#E5F2FD':'#F5F5F5')+';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:'+(isSel?'#1677FF':'#888')+';flex-shrink:0">'+s.av+'</div>'
-          +'<div style="flex:1;font-size:12px;font-weight:700;color:'+(isSel?'#1677FF':'#212121')+'">'+s.nm+'</div>'
-          +'<button class="blk-sel-btn" data-bsi="'+si+'" style="width:22px;height:22px;border-radius:6px;border:1.5px solid '+(isSel?'#1677FF':'#ddd')+';background:'+(isSel?'#1677FF':'#fff')+';cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
-          +(isSel?'<svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>':'<svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 2v6M2 5h6" stroke="#aaa" stroke-width="1.5" stroke-linecap="round"/></svg>')
+        rows+='<div style="display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid #F5F5F5;background:'+(isSel?'#EEF6FF':'#fff')+'">'
+          +'<div style="width:32px;height:32px;border-radius:50%;background:'+(isSel?'#E5F2FD':'#F0F0F0')+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:'+(isSel?'#1677FF':'#888')+';flex-shrink:0">'+s.av+'</div>'
+          +'<div style="flex:1;font-size:13px;font-weight:700;color:'+(isSel?'#1677FF':'#212121')+'">'+s.nm+'</div>'
+          +'<button class="blk-sel-btn" data-bsi="'+si+'" style="width:26px;height:26px;border-radius:8px;border:1.5px solid '+(isSel?'#1677FF':'#ddd')+';background:'+(isSel?'#1677FF':'#fff')+';cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
+          +(isSel?'<svg width="12" height="12" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':'<svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2v8M2 6h8" stroke="#aaa" stroke-width="1.6" stroke-linecap="round"/></svg>')
           +'</button></div>';
       });
     });
   }
+
+  // 오른쪽 패널: 선택된 학생 칩
   var chips=b.sel.map(function(si){
-    return '<span style="display:inline-flex;align-items:center;gap:3px;padding:3px 7px 3px 9px;border-radius:20px;background:#E5F2FD;font-size:11px;font-weight:700;color:#1677FF">'
-      +SD[si].nm+'<button class="blk-rm" data-rsi="'+si+'" style="width:14px;height:14px;border-radius:50%;border:none;background:rgba(22,119,255,.2);color:#1677FF;cursor:pointer;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0;line-height:1">×</button></span>';
+    return '<span style="display:inline-flex;align-items:center;gap:3px;padding:4px 8px 4px 11px;border-radius:20px;background:#E8F1FF;font-size:12px;font-weight:700;color:#1677FF">'
+      +SD[si].nm
+      +'<button class="blk-rm" data-rsi="'+si+'" style="width:16px;height:16px;border-radius:50%;border:none;background:rgba(22,119,255,.18);color:#1677FF;cursor:pointer;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;flex-shrink:0">×</button></span>';
   }).join('');
+
+  // 날짜/시간
   var dateStr=b.y+'년 '+b.m+'월 '+b.d+'일 ('+DW[gdow(b.d)]+')';
   var tryTime=b.useNow?nowT():b.time;
-  return '<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #eee;flex-shrink:0">'
-    +'<div style="font-size:15px;font-weight:800;color:#212121">일괄 처리</div>'
-    +'<button id="blk-close" style="width:28px;height:28px;border-radius:7px;border:none;background:#F5F5F5;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8" stroke="#888" stroke-width="1.5" stroke-linecap="round"/></svg></button></div>'
+
+  return '<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid #F0F0F0;flex-shrink:0">'
+    +'<div style="font-size:17px;font-weight:800;color:#212121">일괄 처리</div>'
+    +'<button id="blk-close" style="width:30px;height:30px;border-radius:8px;border:none;background:#F5F5F5;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8" stroke="#888" stroke-width="1.5" stroke-linecap="round"/></svg></button></div>'
+    // 본문
     +'<div style="display:flex;flex:1;overflow:hidden;min-height:0">'
-    +'<div style="flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid #eee">'
-    +'<div style="display:flex;border-bottom:1px solid #eee;flex-shrink:0">'+tabBar+'</div>'
-    +'<div style="padding:8px 12px;display:flex;gap:8px;border-bottom:1px solid #F5F5F5;flex-shrink:0;align-items:center">'
-    +'<div style="flex:1;display:flex;align-items:center;gap:5px;border:1.5px solid #ddd;border-radius:7px;padding:5px 9px"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="5" cy="5" r="3.5" stroke="#888" stroke-width="1.3"/><path d="M8 8l2.5 2.5" stroke="#888" stroke-width="1.3" stroke-linecap="round"/></svg><input id="blk-sq" type="text" placeholder="학생이름 검색" value="'+b.sq+'" style="border:none;outline:none;font-size:11px;color:#212121;width:100%;background:transparent"></div>'
-    +'<button id="blk-all-sel" style="font-size:11px;font-weight:700;color:#1677FF;border:none;background:transparent;cursor:pointer;white-space:nowrap;padding:4px 6px">전체선택</button></div>'
+    // ── 왼쪽 패널 ──
+    +'<div style="flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid #F0F0F0">'
+    +'<div style="display:flex;border-bottom:1px solid #F0F0F0;flex-shrink:0;padding:0 6px">'+tabBar+'</div>'
+    +'<div style="padding:10px 14px;display:flex;gap:8px;border-bottom:1px solid #F5F5F5;flex-shrink:0;align-items:center">'
+    +'<div style="flex:1;display:flex;align-items:center;gap:6px;border:1.5px solid #E5E5E5;border-radius:8px;padding:7px 12px;background:#fff">'
+    +'<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="#aaa" stroke-width="1.4"/><path d="M10 10l2.5 2.5" stroke="#aaa" stroke-width="1.4" stroke-linecap="round"/></svg>'
+    +'<input id="blk-sq" type="text" placeholder="학생이름 검색" value="'+b.sq+'" style="border:none;outline:none;font-size:13px;color:#212121;width:100%;background:transparent"></div>'
+    +'<button id="blk-all-sel" style="font-size:12px;font-weight:700;color:#1677FF;border:none;background:transparent;cursor:pointer;white-space:nowrap;padding:4px 6px">전체선택</button></div>'
     +'<div style="overflow-y:auto;flex:1;min-height:0">'+rows+'</div></div>'
-    +'<div style="width:230px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden">'
-    +'<div style="padding:11px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;flex-shrink:0"><span style="font-size:12px;font-weight:800;color:#212121">선택된 학생 '+b.sel.length+'</span><button id="blk-reset-sel" style="font-size:11px;color:#aaa;border:none;background:transparent;cursor:pointer;padding:0">초기화</button></div>'
-    +'<div style="flex:1;padding:10px 12px;overflow-y:auto;display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start;min-height:0">'+(chips||'<div style="width:100%;padding:24px 0;text-align:center;color:#ccc;font-size:11px">학생을 선택하세요</div>')+'</div></div></div>'
-    +'<div style="padding:11px 18px;border-top:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0;background:#fafafa;flex-wrap:wrap">'
-    +'<div style="display:flex;align-items:center;gap:5px"><span style="font-size:10px;font-weight:700;color:#888">날짜</span><span style="font-size:11px;font-weight:700;color:#212121">'+dateStr+'</span>'
-    +'<label style="display:flex;align-items:center;gap:3px;cursor:pointer"><input id="blk-today-chk" type="checkbox"'+(b.todayFlag?' checked':'')+' style="cursor:pointer"><span style="font-size:10px;color:#888">오늘</span></label></div>'
-    +'<div style="width:1px;height:14px;background:#ddd"></div>'
-    +'<div style="display:flex;align-items:center;gap:5px"><span style="font-size:10px;font-weight:700;color:#888">시간</span>'
-    +(b.useNow?'<span style="font-size:12px;font-weight:800;color:#1677FF">'+tryTime+'</span>':'<input id="blk-time" type="time" value="'+b.time+'" style="border:1.5px solid #ddd;border-radius:6px;padding:3px 7px;font-size:11px;font-weight:700;color:#212121;outline:none">')
-    +'<button id="blk-now-tog" style="font-size:10px;font-weight:700;color:#888;border:1.5px solid #ddd;background:#fff;border-radius:5px;padding:2px 7px;cursor:pointer">'+(b.useNow?'직접 입력':'현재 시각')+'</button></div>'
-    +'<div style="margin-left:auto;display:flex;gap:7px">'
-    +'<button id="blk-do-in" style="padding:8px 18px;border-radius:8px;border:none;background:#1677FF;color:#fff;font-size:12px;font-weight:700;cursor:pointer">일괄 등원</button>'
-    +'<button id="blk-do-out" style="padding:8px 18px;border-radius:8px;border:none;background:#FB1A18;color:#fff;font-size:12px;font-weight:700;cursor:pointer">일괄 하원</button>'
+    // ── 오른쪽 패널 ──
+    +'<div style="width:260px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden">'
+    // 헤더
+    +'<div style="padding:13px 18px;border-bottom:1px solid #F0F0F0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">'
+    +'<span style="font-size:13px;font-weight:800;color:#212121">선택된 학생 '+b.sel.length+'</span>'
+    +'<button id="blk-reset-sel" style="font-size:12px;color:#aaa;border:none;background:transparent;cursor:pointer;padding:0;display:flex;align-items:center;gap:3px">'
+    +'<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M10 6A4 4 0 1 1 6 2" stroke="#aaa" stroke-width="1.4" stroke-linecap="round"/><path d="M6 1v3l2-1.5" stroke="#aaa" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    +'초기화</button></div>'
+    // 칩 영역 (flex:1, 스크롤)
+    +'<div style="flex:1;padding:12px 16px;overflow-y:auto;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;min-height:0">'
+    +(chips||'<div style="width:100%;padding:24px 0;text-align:center;color:#ccc;font-size:12px">학생을 선택하세요</div>')+'</div>'
+    // 날짜/시간/버튼 영역 (하단 고정)
+    +'<div style="flex-shrink:0;border-top:1px solid #F0F0F0;padding:14px 18px 16px">'
+    // 날짜 선택
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+    +'<span style="font-size:11px;font-weight:600;color:#888;white-space:nowrap">날짜 선택</span>'
+    +'<div style="display:flex;align-items:center;gap:7px">'
+    +'<span style="font-size:12px;font-weight:700;color:#212121;white-space:nowrap">'+dateStr+'</span>'
+    +'<label style="display:flex;align-items:center;gap:3px;cursor:pointer;white-space:nowrap">'
+    +'<input id="blk-today-chk" type="checkbox"'+(b.todayFlag?' checked':'')+' style="cursor:pointer;accent-color:#1677FF">'
+    +'<span style="font-size:11px;color:#888">오늘</span></label></div></div>'
+    // 시간 선택
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+    +'<span style="font-size:11px;font-weight:600;color:#888;white-space:nowrap">시간 선택</span>'
+    +'<div style="display:flex;align-items:center;gap:7px">'
+    +(b.useNow?'<span style="font-size:14px;font-weight:800;color:#1677FF">'+tryTime+'</span>':
+              '<input id="blk-time" type="time" value="'+b.time+'" style="border:1.5px solid #ddd;border-radius:7px;padding:4px 9px;font-size:13px;font-weight:700;color:#212121;outline:none;width:90px">')
+    +'<button id="blk-now-tog" style="font-size:11px;font-weight:600;color:#888;border:1.5px solid #E5E5E5;background:#fff;border-radius:6px;padding:3px 8px;cursor:pointer;white-space:nowrap">'+(b.useNow?'직접 입력':'현재 시각')+'</button></div></div>'
+    // 일괄 등원/하원 버튼
+    +'<div style="display:flex;gap:8px">'
+    +'<button id="blk-do-in" style="flex:1;padding:11px 0;border-radius:9px;border:none;background:#1677FF;color:#fff;font-size:13px;font-weight:700;cursor:pointer">일괄 등원</button>'
+    +'<button id="blk-do-out" style="flex:1;padding:11px 0;border-radius:9px;border:none;background:#FB1A18;color:#fff;font-size:13px;font-weight:700;cursor:pointer">일괄 하원</button>'
+    +'</div></div>'
     +'</div></div>';
 }
 function blkResultMHTML() {
