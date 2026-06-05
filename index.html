@@ -469,7 +469,7 @@ function blkResultMHTML() {
     var labelMap={
       'PREV_OPEN':{lbl:'이전 등원 미하원',c:'#e05c5c'},
       'NO_ENTRY':{lbl:'등원 이력 없음',c:'#e05c5c'},
-      'ALREADY_OUT':{lbl:'이미 하원 완료',c:'#e67e22'},
+      'ALREADY_OUT':{lbl:'하원가능한 등원 기록이 없음',c:'#e05c5c'},
       'TIME_BEFORE_PREV':{lbl:'등원 시간 확인',c:'#e67e22'},
       'TIME_OVERLAP':{lbl:'시간 겹침',c:'#e67e22'},
       'TIME_BEFORE_ENTRY':{lbl:'하원 시간 확인',c:'#e67e22'},
@@ -483,8 +483,8 @@ function blkResultMHTML() {
     else if(r.code==='TIME_BEFORE_PREV'){inputLbl='등원 시간';hint='기존 하원 시각('+r.prevTime+')보다 이른 시각입니다. 시각을 수정해 주세요';}
     else if(r.code==='TIME_OVERLAP'){inputLbl=(b.lastType==='in'?'등원':'하원')+' 시간';hint='기존 출결('+r.overlaps+')과 겹칩니다. 시각을 수정해 주세요';}
     else if(r.code==='TIME_BEFORE_ENTRY'){inputLbl='하원 시간';hint='등원 시각('+r.prevTime+')보다 이른 시각입니다. 시각을 수정해 주세요';}
-    else if(r.code==='ALREADY_OUT'){showInput=false;hint='이미 하원 처리가 완료되어 있습니다.';}
-    else if(r.code==='FUTURE'){showInput=false;hint='현재 시각 이후 시각은 처리할 수 없습니다.';}
+    else if(r.code==='ALREADY_OUT'){inputLbl='등원 시간';hint='이전 등원이 존재하지 않습니다. 등원을 입력해 주세요';}
+    else if(r.code==='FUTURE'){showInput=false;hint='현재 시각('+nowT()+') 이후 시각은 처리할 수 없습니다.';}
     else{showInput=false;hint=r.msg;}
 
     var recHTML='';
@@ -692,8 +692,8 @@ function bindBulkModal() {
         var last=raw[raw.length-1];
         if(last&&last.i&&!last.o) last.o=st.time;
         raw.push({i:tryTime,o:''});
-      } else if(r.code==='NO_ENTRY'){
-        // 등원+하원 동시 추가
+      } else if(r.code==='NO_ENTRY'||r.code==='ALREADY_OUT'){
+        // 등원+하원 동시 추가 (다회 출결)
         raw.push({i:st.time,o:tryTime});
       } else if(r.code==='TIME_BEFORE_PREV'||r.code==='TIME_OVERLAP'){
         // 수정된 시각으로 등원
