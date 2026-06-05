@@ -1081,9 +1081,9 @@ function buildMo(list) {
   var h='<table class="tbl" style="table-layout:fixed;min-width:100%"><thead><tr>';
   h+='<th style="position:sticky;left:0;z-index:10;background:#F7F8F9;width:90px;min-width:90px;border-right:2px solid #eee">학생명</th>';
   for(var d=1;d<=30;d++){
-    var dw=gdow(d); var isSat=dw===6; var isSun=dw===7; var isT=(d===27&&a.cm===4); var iBD=isSel&&d===a.bd;
-    var bg=iBD?'#DCEEFF':isT?'#E5F2FD':isSat?'#f5f5ff':isSun?'#fff5f5':'#F7F8F9';
-    var c=(iBD||isT)?'#1677FF':isSat?'#7c7cd8':isSun?'#e05c5c':'#555';
+    var dw=gdow(d); var isSat=dw===6; var isSun=dw===7; var isT=(d===27&&a.cm===4);
+    var bg=isT?'#E5F2FD':isSat?'#f5f5ff':isSun?'#fff5f5':'#F7F8F9';
+    var c=isT?'#1677FF':isSat?'#7c7cd8':isSun?'#e05c5c':'#555';
     h+='<th style="background:'+bg+';color:'+c+';width:42px;min-width:42px;border-right:1px solid #eee;text-align:center;padding:6px 2px">'+DW[dw]+'<br>'+d+'</th>';
   }
   h+='</tr></thead><tbody>';
